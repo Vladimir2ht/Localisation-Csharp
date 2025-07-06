@@ -1,41 +1,49 @@
+using Microsoft.EntityFrameworkCore;
+using FluentValidation.AspNetCore;
+using LocalizationNamespace.Data;          // Контекст БД
+using LocalizationNamespace.Services;      // Сервисы (если есть)
+using LocalizationNamespace.Validators;    // Валидация
+
 var builder = WebApplication.CreateBuilder(args);
 
-string CorsPolicy = "local";
+// Добавляем конфигурацию подключения к PostgreSQL из appsettings.json
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddCors(options =>
-{
-	options.AddPolicy(
-			name: CorsPolicy,
-			policy =>
-				{
-					policy.WithOrigins("http://localhost:3000", "http://[::1]:3000");
-				}
-		);
-});
+// Добавляем контроллеры с поддержкой FluentValidation
+builder.Services.AddControllers()
+    .AddFluentValidation(fv =>
+    {
+        fv.RegisterValidatorsFromAssemblyContaining<Program>(); // Регистрируем валидаторы из сборки
+    });
 
-// builder.Services.AddMemoryCache();
-builder.Services.AddRazorPages();
+// Добавляем Swagger для удобства тестирования API (необязательно, но рекомендуется)
+// builder.Services.AddEndpointsApiExplorer();
+// builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// if (!app.Environment.IsDevelopment())
-// {
-app.UseExceptionHandler("/Error");
-// }
+// Мидлвары
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+    // app.UseSwagger();
+    // app.UseSwaggerUI();
+}
+else
+{
+    app.UseExceptionHandler("/error"); // Можно настроить контроллер ошибки
+    app.UseHsts();
+}
 
 app.UseHttpsRedirection();
-app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseCors(CorsPolicy);
+// app.UseCors(CorsPolicy);
 
 app.UseAuthorization();
 
-app.MapControllerRoute(name: "default", pattern: "{controller=Main}/{action=Index}");
-app.MapControllerRoute("get", "get", new { controller = "Main", action = "Get" });
-app.MapControllerRoute(name: "NotFound", "{*url}", new { controller = "Main", action = "Index" });
-
-app.MapRazorPages();
+app.MapControllers();
 
 app.Run();

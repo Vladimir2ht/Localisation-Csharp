@@ -1,0 +1,12 @@
+services:
+  postgres:
+    container_name: 'postgres'
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: localization-db
+      POSTGRES_PASSWORD: pass123
+    ports:
+      - "5432:5432"
+    # volumes:
+    #   - /media/docker_postgres:/var/lib/postgresql/data
