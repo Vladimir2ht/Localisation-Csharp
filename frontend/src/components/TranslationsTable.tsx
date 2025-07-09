@@ -2,11 +2,7 @@
 
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
-
-interface TranslationRow {
-  key: string;
-  translations: Record<string, string>;
-}
+import { TranslationRow } from "@/api/api";
 
 interface TranslationsTableProps {
   languages: string[];

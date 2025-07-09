@@ -6,41 +6,53 @@ using LocalizationNamespace.Validators;    // Валидация
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Добавляем конфигурацию подключения к PostgreSQL из appsettings.json
+builder.Services.AddCors(options =>
+{
+	options.AddDefaultPolicy(policy =>
+	{
+		policy.WithOrigins("http://localhost:3000")
+				.AllowAnyHeader()
+				.AllowAnyMethod();
+	});
+});
+
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+	options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Добавляем контроллеры с поддержкой FluentValidation
 builder.Services.AddControllers()
-    .AddFluentValidation(fv =>
-    {
-        fv.RegisterValidatorsFromAssemblyContaining<Program>(); // Регистрируем валидаторы из сборки
-    });
+	.AddFluentValidation(fv =>
+	{
+		fv.RegisterValidatorsFromAssemblyContaining<Program>(); // Регистрируем валидаторы из сборки
+	});
 
 // Добавляем Swagger для удобства тестирования API (необязательно, но рекомендуется)
 // builder.Services.AddEndpointsApiExplorer();
 // builder.Services.AddSwaggerGen();
+
+// Add TranslationsTableService
+builder.Services.AddScoped<TranslationsTableService>();
 
 var app = builder.Build();
 
 // Мидлвары
 if (app.Environment.IsDevelopment())
 {
-    app.UseDeveloperExceptionPage();
-    // app.UseSwagger();
-    // app.UseSwaggerUI();
+	app.UseDeveloperExceptionPage();
+	// app.UseSwagger();
+	// app.UseSwaggerUI();
 }
 else
 {
-    app.UseExceptionHandler("/error"); // Можно настроить контроллер ошибки
-    app.UseHsts();
+	app.UseExceptionHandler("/error"); // Можно настроить контроллер ошибки
+	app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 
 app.UseRouting();
 
-// app.UseCors(CorsPolicy);
+app.UseCors();
 
 app.UseAuthorization();
 

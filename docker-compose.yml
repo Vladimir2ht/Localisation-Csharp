@@ -1,11 +1,39 @@
 services:
+  frontend:
+    container_name: frontend
+    build:
+      context: ./frontend
+      dockerfile: dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+
+  backend:
+    container_name: backend
+    build:
+      context: ./backend
+      dockerfile: dockerfile
+    ports:
+      - "2000:2000"
+    restart: always
+    # depends_on:
+    #   - postgres
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:2000
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=localization-db;Username=localization-db;Password=pass123
+
   postgres:
     container_name: 'postgres'
-    image: postgres:17
+    build:
+      context: .
+      dockerfile: sql/postgresql.dockerfile
     restart: unless-stopped
     environment:
       POSTGRES_USER: localization-db
       POSTGRES_PASSWORD: pass123
+      # POSTGRES_DB: localization-db
     ports:
       - "5432:5432"
     # volumes:
