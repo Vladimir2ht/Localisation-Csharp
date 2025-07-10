@@ -4,9 +4,9 @@ import { useState, useEffect } from "react";
 import { Header } from "../components/Header";
 import { TranslationsTable } from "../components/TranslationsTable";
 import { Pagination } from "../components/Pagination";
-import { getTranslations, TranslationRow } from "../api/api";
+import { getTranslations, getLanguages, addLanguage, addTranslationKey, TranslationRow } from "../api/api";
 
-const LANGUAGES = ["English", "Spanish", "French"];
+// const LANGUAGES = ["English", "Spanish", "French"];
 
 /* const INITIAL_DATA = [
 	{
@@ -93,21 +93,29 @@ const LANGUAGES = ["English", "Spanish", "French"];
 
 export default function Home() {
 	const [data, setData] = useState<TranslationRow[]>([]);
+	const [languages, setLanguages] = useState<string[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 	const [currentPage, setCurrentPage] = useState(1);
 	const pageSize = 5;
 
+	async function fetchData() {
+		try {
+			const [langs, translations] = await Promise.all([
+				getLanguages(),
+				getTranslations(),
+			]);
+			setLanguages(langs);
+			setData(translations);
+			setLoading(false);
+		} catch {
+			setError("Ошибка загрузки данных");
+			setLoading(false);
+		}
+	}
+
 	useEffect(() => {
-		getTranslations()
-			.then((res) => {
-				setData(res);
-				setLoading(false);
-			})
-			.catch(() => {
-				setError("Ошибка загрузки данных");
-				setLoading(false);
-			});
+		fetchData();
 	}, []);
 
 	const totalPages = Math.ceil(data.length / pageSize);
@@ -126,13 +134,23 @@ export default function Home() {
 		);
 	}
 
+	async function handleAddLanguage(language: string) {
+		await addLanguage(language);
+		fetchData();
+	}
+
+	async function handleAddKey(key: string) {
+		await addTranslationKey(key);
+		fetchData();
+	}
+
 	if (loading) return <div className="p-10 text-center">Загрузка...</div>;
 	if (error) return <div className="p-10 text-center text-red-500">{error}</div>;
 
 	return (
 		<div className="relative flex min-h-screen flex-col bg-white overflow-x-hidden" style={{ fontFamily: 'Inter, "Noto Sans", sans-serif' }}>
 			<div className="layout-container flex h-full grow flex-col">
-				<Header />
+				<Header onAddLanguage={handleAddLanguage} onAddKey={handleAddKey} />
 				<main className="px-40 flex flex-1 justify-center py-5">
 					<div className="layout-content-container flex flex-col max-w-[960px] flex-1">
 						<div className="flex flex-wrap justify-between gap-3 p-4">
@@ -140,7 +158,7 @@ export default function Home() {
 								Translations
 							</p>
 						</div>
-						<TranslationsTable languages={LANGUAGES} data={pagedData} onEdit={handleEdit} />
+						<TranslationsTable languages={languages} data={pagedData} onEdit={handleEdit} />
 					</div>
 				</main>
 				<Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />

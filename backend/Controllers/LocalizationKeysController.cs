@@ -8,18 +8,18 @@ using Microsoft.EntityFrameworkCore;
 [Route("api/[controller]")]
 public class LocalizationKeysController : ControllerBase
 {
-	private readonly AppDbContext _context;
+	private readonly AppDbContext _dbContext;
 
 	public LocalizationKeysController(AppDbContext context)
 	{
-		_context = context;
+		_dbContext = context;
 	}
 
 	// GET: api/LocalizationKeys?page=1&pageSize=20&search=key
 	[HttpGet]
 	public async Task<IActionResult> GetAll(int page = 1, int pageSize = 20, string? search = null)
 	{
-		var query = _context.LocalizationKeys.AsQueryable();
+		var query = _dbContext.LocalizationKeys.AsQueryable();
 
 		if (!string.IsNullOrWhiteSpace(search))
 		{
@@ -40,20 +40,30 @@ public class LocalizationKeysController : ControllerBase
 	[HttpGet("{id}")]
 	public async Task<IActionResult> Get(int id)
 	{
-		var key = await _context.LocalizationKeys.FindAsync(id);
+		var key = await _dbContext.LocalizationKeys.FindAsync(id);
 		if (key == null) return NotFound();
 		return Ok(key);
 	}
 
+	// DTO для входных данных Create
+	public class CreateLocalizationKeyRequest
+	{
+		public string key { get; set; }
+	}
+
 	// POST: api/LocalizationKeys
 	[HttpPost]
-	public async Task<IActionResult> Create([FromBody] LocalizationKey model)
+	public async Task<IActionResult> Create([FromBody] CreateLocalizationKeyRequest request)
 	{
-		if (await _context.LocalizationKeys.AnyAsync(k => k.Key == model.Key))
+		if (string.IsNullOrWhiteSpace(request.key))
+			return BadRequest("Key is required.");
+
+		if (await _dbContext.LocalizationKeys.AnyAsync(k => k.Key == request.key))
 			return Conflict("Key already exists.");
 
-		_context.LocalizationKeys.Add(model);
-		await _context.SaveChangesAsync();
+		var model = new LocalizationKey { Key = request.key };
+		_dbContext.LocalizationKeys.Add(model);
+		await _dbContext.SaveChangesAsync();
 		return CreatedAtAction(nameof(Get), new { id = model.Id }, model);
 	}
 
@@ -63,13 +73,13 @@ public class LocalizationKeysController : ControllerBase
 	{
 		if (id != model.Id) return BadRequest();
 
-		var existing = await _context.LocalizationKeys.FindAsync(id);
+		var existing = await _dbContext.LocalizationKeys.FindAsync(id);
 		if (existing == null) return NotFound();
 
 		existing.Key = model.Key;
 		// обновить другие поля, если есть
 
-		await _context.SaveChangesAsync();
+		await _dbContext.SaveChangesAsync();
 		return NoContent();
 	}
 
@@ -77,11 +87,11 @@ public class LocalizationKeysController : ControllerBase
 	[HttpDelete("{id}")]
 	public async Task<IActionResult> Delete(int id)
 	{
-		var existing = await _context.LocalizationKeys.FindAsync(id);
+		var existing = await _dbContext.LocalizationKeys.FindAsync(id);
 		if (existing == null) return NotFound();
 
-		_context.LocalizationKeys.Remove(existing);
-		await _context.SaveChangesAsync();
+		_dbContext.LocalizationKeys.Remove(existing);
+		await _dbContext.SaveChangesAsync();
 		return NoContent();
 	}
 }

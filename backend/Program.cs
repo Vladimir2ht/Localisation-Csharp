@@ -30,8 +30,10 @@ builder.Services.AddControllers()
 // builder.Services.AddEndpointsApiExplorer();
 // builder.Services.AddSwaggerGen();
 
-// Add TranslationsTableService
 builder.Services.AddScoped<TranslationsTableService>();
+builder.Services.AddScoped<LanguageService>();
+
+builder.Services.AddScoped<FluentValidation.IValidator<LocalizationNamespace.DTOs.LanguageDto>, LocalizationNamespace.Validators.LanguageValidator>();
 
 var app = builder.Build();
 

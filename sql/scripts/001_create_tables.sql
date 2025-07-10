@@ -17,3 +17,11 @@ CREATE TABLE "Translations" (
     FOREIGN KEY ("LocalizationKeyId") REFERENCES "LocalizationKeys"("Id") ON DELETE CASCADE,
     FOREIGN KEY ("LanguageId") REFERENCES "Languages"("Id") ON DELETE CASCADE
 );
+
+INSERT INTO "LocalizationKeys" ("Key") VALUES
+    ('HELLO'),
+    ('GOODBYE');
+
+INSERT INTO "Languages" ("Code", "Name") VALUES
+    ('en', 'English'),
+    ('ru', 'Russian');
