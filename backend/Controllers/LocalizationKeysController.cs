@@ -5,7 +5,7 @@ using LocalizationNamespace.Models;
 using Microsoft.EntityFrameworkCore;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("[controller]")]
 public class LocalizationKeysController : ControllerBase
 {
 	private readonly AppDbContext _dbContext;
@@ -15,7 +15,7 @@ public class LocalizationKeysController : ControllerBase
 		_dbContext = context;
 	}
 
-	// GET: api/LocalizationKeys?page=1&pageSize=20&search=key
+	// GET: LocalizationKeys?page=1&pageSize=20&search=key
 	[HttpGet]
 	public async Task<IActionResult> GetAll(int page = 1, int pageSize = 20, string? search = null)
 	{
@@ -36,7 +36,7 @@ public class LocalizationKeysController : ControllerBase
 		return Ok(new { totalItems, items });
 	}
 
-	// GET: api/LocalizationKeys/5
+	// GET: LocalizationKeys/5
 	[HttpGet("{id}")]
 	public async Task<IActionResult> Get(int id)
 	{
@@ -45,14 +45,13 @@ public class LocalizationKeysController : ControllerBase
 		return Ok(key);
 	}
 
-	// DTO для входных данных Create
 	public class CreateLocalizationKeyRequest
 	{
 		public string key { get; set; }
 	}
 
-	// POST: api/LocalizationKeys
-	[HttpPost]
+	// Put: LocalizationKeys
+	[HttpPut]
 	public async Task<IActionResult> Create([FromBody] CreateLocalizationKeyRequest request)
 	{
 		if (string.IsNullOrWhiteSpace(request.key))
@@ -67,7 +66,7 @@ public class LocalizationKeysController : ControllerBase
 		return CreatedAtAction(nameof(Get), new { id = model.Id }, model);
 	}
 
-	// PUT: api/LocalizationKeys/5
+	// PUT: LocalizationKeys/5
 	[HttpPut("{id}")]
 	public async Task<IActionResult> Update(int id, [FromBody] LocalizationKey model)
 	{
@@ -83,7 +82,7 @@ public class LocalizationKeysController : ControllerBase
 		return NoContent();
 	}
 
-	// DELETE: api/LocalizationKeys/5
+	// DELETE: LocalizationKeys/5
 	[HttpDelete("{id}")]
 	public async Task<IActionResult> Delete(int id)
 	{

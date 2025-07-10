@@ -6,7 +6,8 @@ CREATE TABLE "LocalizationKeys" (
 CREATE TABLE "Languages" (
     "Id" SERIAL PRIMARY KEY,
     "Code" TEXT NOT NULL,
-    "Name" TEXT NOT NULL
+    "Name" TEXT NOT NULL,
+    "InUse" BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE "Translations" (

@@ -6,23 +6,14 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 
 interface HeaderProps {
-  onAddLanguage: (language: string) => void;
+  onAddLanguage: () => void;
   onAddKey: (key: string) => void;
 }
 
 export function Header({ onAddLanguage, onAddKey }: HeaderProps) {
-  const [showLangInput, setShowLangInput] = useState(false);
   const [showKeyInput, setShowKeyInput] = useState(false);
-  const [langValue, setLangValue] = useState("");
   const [keyValue, setKeyValue] = useState("");
 
-  function handleAddLang() {
-    if (langValue.trim()) {
-      onAddLanguage(langValue.trim());
-      setLangValue("");
-      setShowLangInput(false);
-    }
-  }
   function handleAddKey() {
     if (keyValue.trim()) {
       onAddKey(keyValue.trim());
@@ -84,28 +75,13 @@ export function Header({ onAddLanguage, onAddKey }: HeaderProps) {
               Add Key
             </Button>
           )}
-          {showLangInput ? (
-            <div className="flex gap-2">
-              <Input
-                autoFocus
-                value={langValue}
-                onChange={e => setLangValue(e.target.value)}
-                onKeyDown={e => { if (e.key === "Enter") handleAddLang(); if (e.key === "Escape") setShowLangInput(false); }}
-                placeholder="New language"
-                className="h-10"
-              />
-              <Button onClick={handleAddLang} className="h-10 bg-[#0c7ff2] text-white">OK</Button>
-              <Button variant="outline" onClick={() => setShowLangInput(false)} className="h-10">Cancel</Button>
-            </div>
-          ) : (
-            <Button
-              variant="outline"
-              className="min-w-[84px] max-w-[480px] h-10 text-[#111418] bg-[#f0f2f5] font-bold text-sm tracking-[0.015em]"
-              onClick={() => setShowLangInput(true)}
-            >
-              Add Language
-            </Button>
-          )}
+          <Button
+            variant="outline"
+            className="min-w-[84px] max-w-[480px] h-10 text-[#111418] bg-[#f0f2f5] font-bold text-sm tracking-[0.015em]"
+            onClick={onAddLanguage}
+          >
+            Add Language
+          </Button>
         </div>
       </div>
     </header>

@@ -19,7 +19,7 @@ namespace LocalizationNamespace.Services
 		public async Task<List<LanguageDto>> GetAllAsync()
 		{
 			return await _context.Languages
-				.Select(l => new LanguageDto { Id = l.Id, Code = l.Code, Name = l.Name })
+				.Select(l => new LanguageDto { Id = l.Id, Code = l.Code, Name = l.Name, InUse = l.InUse })
 				.ToListAsync();
 		}
 
@@ -27,12 +27,12 @@ namespace LocalizationNamespace.Services
 		{
 			var lang = await _context.Languages.FindAsync(id);
 			if (lang == null) return null;
-			return new LanguageDto { Id = lang.Id, Code = lang.Code, Name = lang.Name };
+			return new LanguageDto { Id = lang.Id, Code = lang.Code, Name = lang.Name, InUse = lang.InUse };
 		}
 
 		public async Task<LanguageDto> CreateAsync(LanguageDto dto)
 		{
-			var entity = new Language { Code = dto.Code, Name = dto.Name };
+			var entity = new Language { Code = dto.Code, Name = dto.Name, InUse = dto.InUse };
 			_context.Languages.Add(entity);
 			await _context.SaveChangesAsync();
 			dto.Id = entity.Id;
@@ -45,6 +45,7 @@ namespace LocalizationNamespace.Services
 			if (entity == null) return false;
 			entity.Code = dto.Code;
 			entity.Name = dto.Name;
+			entity.InUse = dto.InUse;
 			await _context.SaveChangesAsync();
 			return true;
 		}
@@ -54,6 +55,15 @@ namespace LocalizationNamespace.Services
 			var entity = await _context.Languages.FindAsync(id);
 			if (entity == null) return false;
 			_context.Languages.Remove(entity);
+			await _context.SaveChangesAsync();
+			return true;
+		}
+
+		public async Task<bool> SetInUseAsync(int id)
+		{
+			var entity = await _context.Languages.FindAsync(id);
+			if (entity == null || entity.InUse) return false;
+			entity.InUse = true;
 			await _context.SaveChangesAsync();
 			return true;
 		}

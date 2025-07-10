@@ -1,26 +1,33 @@
 import axios from "axios";
 
+export interface Language {
+	id: number;
+	code: string;
+	name: string;
+	inUse: boolean;
+}
+
 export interface TranslationRow {
-  key: string;
-  translations: Record<string, string>;
+	key: string;
+	translations: Record<string, string>;
 }
 
 export async function getTranslations() {
-  const response = await axios.get<TranslationRow[]>("http://localhost:2000/api/TranslationsTable");
-  return response.data;
+	const response = await axios.get<TranslationRow[]>("http://localhost:2000/TranslationsTable");
+	return response.data;
 }
 
-export async function getLanguages() {
-  const response = await axios.get<string[]>("http://localhost:2000/api/Languages");
-  return response.data;
+export async function getLanguages(): Promise<Language[]> {
+	const response = await axios.get<Language[]>("http://localhost:2000/Languages");
+	return response.data;
 }
 
-export async function addLanguage(language: string) {
-  const response = await axios.post("http://localhost:2000/api/Languages", { name: language });
-  return response.data;
+export async function addLanguage(ids: number[]) {
+	const response = await axios.patch("http://localhost:2000/Languages/Enable", ids);
+	return response.data;
 }
 
 export async function addTranslationKey(key: string) {
-  const response = await axios.post("http://localhost:2000/api/LocalizationKeys", { key });
-  return response.data;
+	const response = await axios.put("http://localhost:2000/LocalizationKeys", { key });
+	return response.data;
 }

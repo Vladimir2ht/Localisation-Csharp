@@ -4,9 +4,8 @@ import { useState, useEffect } from "react";
 import { Header } from "../components/Header";
 import { TranslationsTable } from "../components/TranslationsTable";
 import { Pagination } from "../components/Pagination";
-import { getTranslations, getLanguages, addLanguage, addTranslationKey, TranslationRow } from "../api/api";
-
-// const LANGUAGES = ["English", "Spanish", "French"];
+import { getTranslations, getLanguages, addLanguage, addTranslationKey, TranslationRow, Language } from "../api/api";
+import AddLanguageModal from "../components/AddLanguageModal";
 
 /* const INITIAL_DATA = [
 	{
@@ -93,10 +92,11 @@ import { getTranslations, getLanguages, addLanguage, addTranslationKey, Translat
 
 export default function Home() {
 	const [data, setData] = useState<TranslationRow[]>([]);
-	const [languages, setLanguages] = useState<string[]>([]);
+	const [languages, setLanguages] = useState<Language[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 	const [currentPage, setCurrentPage] = useState(1);
+	const [showAddLang, setShowAddLang] = useState(false);
 	const pageSize = 5;
 
 	async function fetchData() {
@@ -118,8 +118,7 @@ export default function Home() {
 		fetchData();
 	}, []);
 
-	const totalPages = Math.ceil(data.length / pageSize);
-	const pagedData = data.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+	const enabledLanguages = languages.filter(l => l.inUse);
 
 	function handleEdit(key: string, lang: string, value: string) {
 		setData(prev =>
@@ -134,9 +133,10 @@ export default function Home() {
 		);
 	}
 
-	async function handleAddLanguage(language: string) {
-		await addLanguage(language);
+	async function handleAddLanguage(ids: number[]) {
+		await addLanguage(ids);
 		fetchData();
+		setShowAddLang(false);
 	}
 
 	async function handleAddKey(key: string) {
@@ -144,13 +144,16 @@ export default function Home() {
 		fetchData();
 	}
 
+	const totalPages = Math.ceil(data.length / pageSize);
+	const pagedData = data.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
 	if (loading) return <div className="p-10 text-center">Загрузка...</div>;
 	if (error) return <div className="p-10 text-center text-red-500">{error}</div>;
 
 	return (
 		<div className="relative flex min-h-screen flex-col bg-white overflow-x-hidden" style={{ fontFamily: 'Inter, "Noto Sans", sans-serif' }}>
 			<div className="layout-container flex h-full grow flex-col">
-				<Header onAddLanguage={handleAddLanguage} onAddKey={handleAddKey} />
+				<Header onAddLanguage={() => setShowAddLang(true)} onAddKey={handleAddKey} />
 				<main className="px-40 flex flex-1 justify-center py-5">
 					<div className="layout-content-container flex flex-col max-w-[960px] flex-1">
 						<div className="flex flex-wrap justify-between gap-3 p-4">
@@ -158,11 +161,19 @@ export default function Home() {
 								Translations
 							</p>
 						</div>
-						<TranslationsTable languages={languages} data={pagedData} onEdit={handleEdit} />
+						<TranslationsTable languages={enabledLanguages.map(l => l.name)} data={pagedData} onEdit={handleEdit} />
 					</div>
 				</main>
 				<Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
 			</div>
+			{showAddLang && (
+				<AddLanguageModal
+					open={showAddLang}
+					languages={languages}
+					onConfirm={handleAddLanguage}
+					onCancel={() => setShowAddLang(false)}
+				/>
+			)}
 		</div>
 	);
 }

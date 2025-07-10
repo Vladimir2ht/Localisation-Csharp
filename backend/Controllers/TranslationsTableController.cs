@@ -7,7 +7,7 @@ using LocalizationNamespace.DTOs;
 namespace LocalizationNamespace.Controllers
 {
 	[ApiController]
-	[Route("api/[controller]")]
+	[Route("[controller]")]
 	public class TranslationsTableController : ControllerBase
 	{
 		private readonly TranslationsTableService _service;
