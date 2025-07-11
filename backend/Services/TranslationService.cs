@@ -15,11 +15,7 @@ namespace LocalizationNamespace.Services
 
 		public bool UpdateTranslation(string key, string lang, string value)
 		{
-			var locKey = _db.LocalizationKeys.FirstOrDefault(k => k.Key == key);
-			var language = _db.Languages.FirstOrDefault(l => l.Code == lang);
-			var translation = (locKey != null && language != null)
-				? _db.Translations.FirstOrDefault(t => t.LocalizationKeyId == locKey.Id && t.LanguageId == language.Id)
-				: null;
+			var translation = _db.Translations.FirstOrDefault(t => t.LocalizationKey == key && t.Language == lang);
 
 			if (string.IsNullOrWhiteSpace(value))
 			{
@@ -36,14 +32,11 @@ namespace LocalizationNamespace.Services
 				return true;
 			}
 
-			if (locKey == null || language == null)
-				return false;
-
 			if (translation == null)
 			{
 				translation = new Translation {
-					LocalizationKeyId = locKey.Id,
-					LanguageId = language.Id,
+					LocalizationKey = key,
+					Language = lang,
 					Value = value
 				};
 				_db.Translations.Add(translation);

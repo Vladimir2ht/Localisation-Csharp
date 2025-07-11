@@ -20,16 +20,15 @@ namespace LocalizationNamespace.Services
 		{
 			var keys = await _context.LocalizationKeys
 				.Include(k => k.Translations)
-				.ThenInclude(t => t.Language)
 				.ToListAsync();
 
 			return keys.Select(k => new TranslationsTableItemDto
 			{
 				Key = k.Key,
 				Translations = k.Translations.ToDictionary(
-						t => t.Language.Name,
-						t => t.Value
-					)
+						 t => t.Language,
+						 t => t.Value
+					 )
 			}).ToList();
 		}
 	}

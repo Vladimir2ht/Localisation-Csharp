@@ -12,12 +12,12 @@ namespace LocalizationNamespace.Validators
 		{
 			_db = db;
 
-			RuleFor(x => x.LocalizationKeyId)
-				.Must(id => _db.LocalizationKeys.Any(k => k.Id == id))
+			RuleFor(x => x.LocalizationKey)
+				.Must(key => _db.LocalizationKeys.Any(k => k.Key == key))
 				.WithMessage("Localization key does not exist.");
 
-			RuleFor(x => x.LanguageId)
-				.Must(id => _db.Languages.Any(l => l.Id == id))
+			RuleFor(x => x.Language)
+				.Must(code => _db.Languages.Any(l => l.Code == code))
 				.WithMessage("Language does not exist.");
 		}
 	}

@@ -1,7 +1,6 @@
 import axios from "axios";
 
 export interface Language {
-	id: number;
 	code: string;
 	name: string;
 	inUse: boolean;
@@ -22,8 +21,8 @@ export async function getLanguages(): Promise<Language[]> {
 	return response.data;
 }
 
-export async function addLanguage(ids: number[]) {
-	const response = await axios.patch("http://localhost:2000/Languages/Enable", ids);
+export async function addLanguage(codes: string[]) {
+	const response = await axios.patch("http://localhost:2000/Languages/Enable", codes);
 	return response.data;
 }
 

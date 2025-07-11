@@ -62,28 +62,24 @@ export function TranslationsTable({ languages, data, onEdit }: TranslationsTable
                 </td>
                 {languages.map((lang, idx) => {
                   const isEditing = editing?.key === key && editing.langCode === lang.code;
-                  const value = translations[lang.name] ?? "";
+                  const value = translations[lang.code] ?? "";
                   return (
                     <td
                       key={lang.code}
                       className={`w-[400px] h-[72px] px-4 py-2 text-[#60758a] text-sm font-normal leading-normal cursor-pointer table-column-${(idx + 1) * 120}`}
                       onClick={() => !isEditing && startEditing(key, lang.code, value)}
                     >
-                      {isEditing ? (
-                        <Input
-                          autoFocus
-                          value={editValue}
-                          onChange={(e) => setEditValue(e.target.value)}
-                          onBlur={saveEdit}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter") saveEdit();
-                            if (e.key === "Escape") cancelEdit();
-                          }}
-                          className="h-8"
-                        />
-                      ) : (
-                        value
-                      )}
+                      {isEditing ? <Input
+                        autoFocus
+                        value={editValue}
+                        onChange={e => setEditValue(e.target.value)}
+                        onBlur={saveEdit}
+                        onKeyDown={e => {
+                          if (e.key === "Enter") saveEdit();
+                          if (e.key === "Escape") cancelEdit();
+                        }}
+                        className="h-8"
+                      /> : value}
                     </td>
                   );
                 })}

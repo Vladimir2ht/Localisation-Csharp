@@ -138,8 +138,8 @@ export default function Home() {
 		}
 	}
 
-	async function handleAddLanguage(ids: number[]) {
-		await addLanguage(ids);
+	async function handleAddLanguage(codes: string[]) {
+		await addLanguage(codes);
 		fetchData();
 		setShowAddLang(false);
 	}

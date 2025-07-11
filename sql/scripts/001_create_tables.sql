@@ -1,22 +1,20 @@
 CREATE TABLE "LocalizationKeys" (
-    "Id" SERIAL PRIMARY KEY,
-    "Key" TEXT NOT NULL
+    "Key" TEXT PRIMARY KEY
 );
 
 CREATE TABLE "Languages" (
-    "Id" SERIAL PRIMARY KEY,
-    "Code" TEXT NOT NULL,
+    "Code" TEXT PRIMARY KEY,
     "Name" TEXT NOT NULL,
     "InUse" BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE "Translations" (
-    "Id" SERIAL PRIMARY KEY,
-    "LocalizationKeyId" INTEGER NOT NULL,
-    "LanguageId" INTEGER NOT NULL,
+    "LocalizationKey" TEXT NOT NULL,
+    "Language" TEXT NOT NULL,
     "Value" TEXT NOT NULL,
-    FOREIGN KEY ("LocalizationKeyId") REFERENCES "LocalizationKeys"("Id") ON DELETE CASCADE,
-    FOREIGN KEY ("LanguageId") REFERENCES "Languages"("Id") ON DELETE CASCADE
+    PRIMARY KEY ("LocalizationKey", "Language"),
+    FOREIGN KEY ("LocalizationKey") REFERENCES "LocalizationKeys"("Key") ON DELETE CASCADE,
+    FOREIGN KEY ("Language") REFERENCES "Languages"("Code") ON DELETE CASCADE
 );
 
 INSERT INTO "LocalizationKeys" ("Key") VALUES
@@ -25,4 +23,5 @@ INSERT INTO "LocalizationKeys" ("Key") VALUES
 
 INSERT INTO "Languages" ("Code", "Name") VALUES
     ('en', 'English'),
+    ('tr', 'Turkish'),
     ('ru', 'Russian');

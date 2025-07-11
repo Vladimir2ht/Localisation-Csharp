@@ -7,29 +7,29 @@ import { Language } from "../api/api";
 interface AddLanguageModalProps {
 	open: boolean;
 	languages: Language[];
-	onConfirm: (ids: number[]) => void;
+	onConfirm: (codes: string[]) => void;
 	onCancel: () => void;
 }
 
 const AddLanguageModal: React.FC<AddLanguageModalProps> = ({ open, languages, onConfirm, onCancel }) => {
-	const [selectedIds, setSelectedIds] = React.useState<number[]>([]);
-	const [currentSelect, setCurrentSelect] = React.useState<number | null>(null);
+	const [selectedCodes, setSelectedIds] = React.useState<string[]>([]);
+	const [currentSelect, setCurrentSelect] = React.useState<string | null>(null);
 
-	const availableLanguages = languages.filter(l => !selectedIds.includes(l.id));
+	const availableLanguages = languages.filter(l => !selectedCodes.includes(l.code));
 
 	function handleAddSelect() {
-		if (currentSelect && !selectedIds.includes(currentSelect)) {
-			setSelectedIds([...selectedIds, currentSelect]);
+		if (currentSelect && !selectedCodes.includes(currentSelect)) {
+			setSelectedIds([...selectedCodes, currentSelect]);
 			setCurrentSelect(null);
 		}
 	}
 
-	function handleRemove(id: number) {
-		setSelectedIds(selectedIds.filter(i => i !== id));
+	function handleRemove(code: string) {
+		setSelectedIds(selectedCodes.filter(i => i !== code));
 	}
 
 	function handleConfirm() {
-		onConfirm(selectedIds);
+		onConfirm(selectedCodes);
 		setSelectedIds([]);
 	}
 
@@ -40,30 +40,29 @@ const AddLanguageModal: React.FC<AddLanguageModalProps> = ({ open, languages, on
 		}
 	}, [open]);
 
-	return (
-		<Dialog open={open} onOpenChange={v => { if (!v) onCancel(); }}>
+	return <Dialog open={open} onOpenChange={v => { if (!v) onCancel(); }}>
 			<DialogContent>
 				<DialogHeader>
 					<DialogTitle>Добавить языки</DialogTitle>
 				</DialogHeader>
 				<div className="space-y-2">
-					{selectedIds.map(id => {
-						const lang = languages.find(l => l.id === id);
+					{selectedCodes.map(code => {
+						const lang = languages.find(l => l.code === code);
 						return lang ? (
-							<div key={id} className="flex items-center gap-2">
+							<div key={code} className="flex items-center gap-2">
 								<span>{lang.name} ({lang.code})</span>
-								<Button variant="outline" size="sm" onClick={() => handleRemove(id)}>Удалить</Button>
+								<Button variant="outline" size="sm" onClick={() => handleRemove(code)}>Удалить</Button>
 							</div>
 						) : null;
 					})}
 					<div className="flex gap-2 items-center">
-						<Select value={currentSelect ? String(currentSelect) : undefined} onValueChange={val => setCurrentSelect(Number(val))}>
+						<Select value={currentSelect ? String(currentSelect) : undefined} onValueChange={val => setCurrentSelect(val)}>
 							<SelectTrigger className="w-[200px]">
 								<SelectValue placeholder="Выберите язык" />
 							</SelectTrigger>
 							<SelectContent>
 								{availableLanguages.map(lang => (
-									<SelectItem key={lang.id} value={String(lang.id)}>
+									<SelectItem key={lang.code} value={String(lang.code)}>
 										{lang.name} ({lang.code})
 									</SelectItem>
 								))}
@@ -73,12 +72,11 @@ const AddLanguageModal: React.FC<AddLanguageModalProps> = ({ open, languages, on
 					</div>
 				</div>
 				<DialogFooter>
-					<Button onClick={handleConfirm} disabled={selectedIds.length === 0}>Подтвердить</Button>
+					<Button onClick={handleConfirm} disabled={selectedCodes.length === 0}>Подтвердить</Button>
 					<Button variant="outline" onClick={onCancel}>Отмена</Button>
 				</DialogFooter>
 			</DialogContent>
-		</Dialog>
-	);
+		</Dialog>;
 };
 
 export default AddLanguageModal;

@@ -24,36 +24,37 @@ namespace LocalizationNamespace.Data
 		{
 			base.OnModelCreating(modelBuilder);
 
-			// Уникальный индекс на ключ локализации
+			modelBuilder.Entity<LocalizationKey>()
+				.HasKey(k => k.Key);
+
 			modelBuilder.Entity<LocalizationKey>()
 				.HasIndex(k => k.Key)
 				.IsUnique();
 
-			// Уникальный индекс на код языка (например, "en", "ru")
+			modelBuilder.Entity<Language>()
+				.HasKey(l => l.Code);
+
 			modelBuilder.Entity<Language>()
 				.HasIndex(l => l.Code)
 				.IsUnique();
 
-			// Конфигурация связи "Перевод" с ключом и языком
 			modelBuilder.Entity<Translation>()
-				.HasKey(t => t.Id);
+				.HasKey(t => new { t.LocalizationKey, t.Language });
 
 			modelBuilder.Entity<Translation>()
-				.HasOne(t => t.LocalizationKey)
+				.HasOne(t => t.LocalizationKeyNavigation)
 				.WithMany(k => k.Translations)
-				.HasForeignKey(t => t.LocalizationKeyId)
+				.HasForeignKey(t => t.LocalizationKey)
 				.OnDelete(DeleteBehavior.Cascade);
 
 			modelBuilder.Entity<Translation>()
-				.HasOne(t => t.Language)
+				.HasOne(t => t.LanguageNavigation)
 				.WithMany(l => l.Translations)
-				.HasForeignKey(t => t.LanguageId)
+				.HasForeignKey(t => t.Language)
 				.OnDelete(DeleteBehavior.Cascade);
 
-			// Уникальный составной индекс для пары (LocalizationKeyId, LanguageId),
-			// чтобы для каждого ключа и языка был только один перевод
 			modelBuilder.Entity<Translation>()
-				.HasIndex(t => new { t.LocalizationKeyId, t.LanguageId })
+				.HasIndex(t => new { t.LocalizationKey, t.Language })
 				.IsUnique();
 		}
 	}

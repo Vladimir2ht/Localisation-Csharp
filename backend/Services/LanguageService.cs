@@ -19,15 +19,15 @@ namespace LocalizationNamespace.Services
 		public async Task<List<LanguageDto>> GetAllAsync()
 		{
 			return await _context.Languages
-				.Select(l => new LanguageDto { Id = l.Id, Code = l.Code, Name = l.Name, InUse = l.InUse })
+				.Select(l => new LanguageDto { Code = l.Code, Name = l.Name, InUse = l.InUse })
 				.ToListAsync();
 		}
 
-		public async Task<LanguageDto> GetByIdAsync(int id)
+		public async Task<LanguageDto> GetByCodeAsync(string code)
 		{
-			var lang = await _context.Languages.FindAsync(id);
+			var lang = await _context.Languages.FirstOrDefaultAsync(l => l.Code == code);
 			if (lang == null) return null;
-			return new LanguageDto { Id = lang.Id, Code = lang.Code, Name = lang.Name, InUse = lang.InUse };
+			return new LanguageDto { Code = lang.Code, Name = lang.Name, InUse = lang.InUse };
 		}
 
 		public async Task<LanguageDto> CreateAsync(LanguageDto dto)
@@ -35,33 +35,31 @@ namespace LocalizationNamespace.Services
 			var entity = new Language { Code = dto.Code, Name = dto.Name, InUse = dto.InUse };
 			_context.Languages.Add(entity);
 			await _context.SaveChangesAsync();
-			dto.Id = entity.Id;
 			return dto;
 		}
 
-		public async Task<bool> UpdateAsync(int id, LanguageDto dto)
+		public async Task<bool> UpdateAsync(string code, LanguageDto dto)
 		{
-			var entity = await _context.Languages.FindAsync(id);
+			var entity = await _context.Languages.FirstOrDefaultAsync(l => l.Code == code);
 			if (entity == null) return false;
-			entity.Code = dto.Code;
 			entity.Name = dto.Name;
 			entity.InUse = dto.InUse;
 			await _context.SaveChangesAsync();
 			return true;
 		}
 
-		public async Task<bool> DeleteAsync(int id)
+		public async Task<bool> DeleteAsync(string code)
 		{
-			var entity = await _context.Languages.FindAsync(id);
+			var entity = await _context.Languages.FirstOrDefaultAsync(l => l.Code == code);
 			if (entity == null) return false;
 			_context.Languages.Remove(entity);
 			await _context.SaveChangesAsync();
 			return true;
 		}
 
-		public async Task<bool> SetInUseAsync(int id)
+		public async Task<bool> SetInUseAsync(string code)
 		{
-			var entity = await _context.Languages.FindAsync(id);
+			var entity = await _context.Languages.FirstOrDefaultAsync(l => l.Code == code);
 			if (entity == null || entity.InUse) return false;
 			entity.InUse = true;
 			await _context.SaveChangesAsync();

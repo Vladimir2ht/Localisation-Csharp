@@ -30,11 +30,11 @@ namespace LocalizationNamespace.Controllers
 			return Ok(langs);
 		}
 
-		// GET: Languages/{id}
-		[HttpGet("{id}")]
-		public async Task<ActionResult<LanguageDto>> GetById(int id)
+		// GET: Languages/{code}
+		[HttpGet("{code}")]
+		public async Task<ActionResult<LanguageDto>> GetByCode(string code)
 		{
-			var lang = await _service.GetByIdAsync(id);
+			var lang = await _service.GetByCodeAsync(code);
 			if (lang == null) return NotFound();
 			return Ok(lang);
 		}
@@ -52,38 +52,38 @@ namespace LocalizationNamespace.Controllers
 				return BadRequest(result.Errors);
 
 			var created = await _service.CreateAsync(dto);
-			return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+			return CreatedAtAction(nameof(GetByCode), new { code = created.Code }, created);
 		}
 
-		// PUT: Languages/{id}
-		[HttpPut("{id}")]
-		public async Task<IActionResult> Update(int id, [FromBody] LanguageDto dto)
+		// PUT: Languages/{code}
+		[HttpPut("{code}")]
+		public async Task<IActionResult> Update(string code, [FromBody] LanguageDto dto)
 		{
 			ValidationResult result = await _validator.ValidateAsync(dto);
 			if (!result.IsValid)
 				return BadRequest(result.Errors);
 
-			var updated = await _service.UpdateAsync(id, dto);
+			var updated = await _service.UpdateAsync(code, dto);
 			if (!updated) return NotFound();
 			return NoContent();
 		}
 
 		// PATCH: Languages/Enable
 		[HttpPatch("Enable")]
-		public async Task<IActionResult> Enable([FromBody] int[] ids)
+		public async Task<IActionResult> Enable([FromBody] string[] codes)
 		{
-			foreach (var id in ids)
+			foreach (var code in codes)
 			{
-				await _service.SetInUseAsync(id);
+				await _service.SetInUseAsync(code);
 			}
 			return NoContent();
 		}
 
-		// DELETE: Languages/{id}
-		[HttpDelete("{id}")]
-		public async Task<IActionResult> Delete(int id)
+		// DELETE: Languages/{code}
+		[HttpDelete("{code}")]
+		public async Task<IActionResult> Delete(string code)
 		{
-			var deleted = await _service.DeleteAsync(id);
+			var deleted = await _service.DeleteAsync(code);
 			if (!deleted) return NotFound();
 			return NoContent();
 		}

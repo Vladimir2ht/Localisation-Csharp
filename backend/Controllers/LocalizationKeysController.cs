@@ -36,13 +36,13 @@ public class LocalizationKeysController : ControllerBase
 		return Ok(new { totalItems, items });
 	}
 
-	// GET: LocalizationKeys/5
-	[HttpGet("{id}")]
-	public async Task<IActionResult> Get(int id)
+	// GET: LocalizationKeys/{key}
+	[HttpGet("{key}")]
+	public async Task<IActionResult> Get(string key)
 	{
-		var key = await _dbContext.LocalizationKeys.FindAsync(id);
-		if (key == null) return NotFound();
-		return Ok(key);
+		var locKey = await _dbContext.LocalizationKeys.FirstOrDefaultAsync(k => k.Key == key);
+		if (locKey == null) return NotFound();
+		return Ok(locKey);
 	}
 
 	public class CreateLocalizationKeyRequest
@@ -50,7 +50,7 @@ public class LocalizationKeysController : ControllerBase
 		public string key { get; set; }
 	}
 
-	// Put: LocalizationKeys
+	// PUT: LocalizationKeys
 	[HttpPut]
 	public async Task<IActionResult> Create([FromBody] CreateLocalizationKeyRequest request)
 	{
@@ -63,16 +63,16 @@ public class LocalizationKeysController : ControllerBase
 		var model = new LocalizationKey { Key = request.key };
 		_dbContext.LocalizationKeys.Add(model);
 		await _dbContext.SaveChangesAsync();
-		return CreatedAtAction(nameof(Get), new { id = model.Id }, model);
+		return CreatedAtAction(nameof(Get), new { key = model.Key }, model);
 	}
 
-	// PUT: LocalizationKeys/5
-	[HttpPut("{id}")]
-	public async Task<IActionResult> Update(int id, [FromBody] LocalizationKey model)
+	// PUT: LocalizationKeys/{key}
+	[HttpPut("{key}")]
+	public async Task<IActionResult> Update(string key, [FromBody] LocalizationKey model)
 	{
-		if (id != model.Id) return BadRequest();
+		if (key != model.Key) return BadRequest();
 
-		var existing = await _dbContext.LocalizationKeys.FindAsync(id);
+		var existing = await _dbContext.LocalizationKeys.FirstOrDefaultAsync(k => k.Key == key);
 		if (existing == null) return NotFound();
 
 		existing.Key = model.Key;
@@ -82,11 +82,11 @@ public class LocalizationKeysController : ControllerBase
 		return NoContent();
 	}
 
-	// DELETE: LocalizationKeys/5
-	[HttpDelete("{id}")]
-	public async Task<IActionResult> Delete(int id)
+	// DELETE: LocalizationKeys/{key}
+	[HttpDelete("{key}")]
+	public async Task<IActionResult> Delete(string key)
 	{
-		var existing = await _dbContext.LocalizationKeys.FindAsync(id);
+		var existing = await _dbContext.LocalizationKeys.FirstOrDefaultAsync(k => k.Key == key);
 		if (existing == null) return NotFound();
 
 		_dbContext.LocalizationKeys.Remove(existing);
