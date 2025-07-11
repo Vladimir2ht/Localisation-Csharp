@@ -76,7 +76,6 @@ public class LocalizationKeysController : ControllerBase
 		if (existing == null) return NotFound();
 
 		existing.Key = model.Key;
-		// обновить другие поля, если есть
 
 		await _dbContext.SaveChangesAsync();
 		return NoContent();

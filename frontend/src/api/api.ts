@@ -35,3 +35,8 @@ export async function updateTranslation(key: string, langCode: string, value: st
 	const response = await axios.put("http://localhost:2000/Translations", { key, langCode, value });
 	return response;
 }
+
+export async function deleteTranslationKey(key: string) {
+	const response = await axios.delete(`http://localhost:2000/LocalizationKeys/${encodeURIComponent(key)}`);
+	return response.data;
+}

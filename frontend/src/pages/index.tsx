@@ -149,6 +149,11 @@ export default function Home() {
 		fetchData();
 	}
 
+	async function handleDeleteKey(key: string) {
+		setData(prev => prev.filter(item => item.key !== key));
+		await fetchData();
+	}
+
 	const totalPages = Math.ceil(data.length / pageSize);
 	const pagedData = data.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
@@ -158,7 +163,12 @@ export default function Home() {
 	return (
 		<div className="relative flex min-h-screen flex-col bg-white overflow-x-hidden" style={{ fontFamily: 'Inter, "Noto Sans", sans-serif' }}>
 			<div className="layout-container flex h-full grow flex-col">
-				<Header onAddLanguage={() => setShowAddLang(true)} onAddKey={handleAddKey} />
+				<Header
+					onAddLanguage={() => setShowAddLang(true)}
+					onAddKey={handleAddKey}
+					onDeleteKey={handleDeleteKey}
+					keys={data.map(d => d.key)}
+				/>
 				<main className="px-40 flex flex-1 justify-center py-5">
 					<div className="layout-content-container flex flex-col max-w-[960px] flex-1">
 						<div className="flex flex-wrap justify-between gap-3 p-4">

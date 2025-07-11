@@ -3,22 +3,47 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { useState } from "react";
+import { deleteTranslationKey } from "@/api/api";
 
 interface HeaderProps {
   onAddLanguage: () => void;
   onAddKey: (key: string) => void;
+  onDeleteKey?: (key: string) => void;
+  keys: string[];
 }
 
-export function Header({ onAddLanguage, onAddKey }: HeaderProps) {
+export function Header({ onAddLanguage, onAddKey, onDeleteKey, keys }: HeaderProps) {
   const [showKeyInput, setShowKeyInput] = useState(false);
   const [keyValue, setKeyValue] = useState("");
+  const [showDeleteInput, setShowDeleteInput] = useState(false);
+  const [selectedDeleteKey, setSelectedDeleteKey] = useState<string>("");
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   function handleAddKey() {
     if (keyValue.trim()) {
       onAddKey(keyValue.trim());
       setKeyValue("");
       setShowKeyInput(false);
+    }
+  }
+
+  async function handleDeleteKey() {
+    if (!selectedDeleteKey) return;
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      await deleteTranslationKey(selectedDeleteKey);
+      if (onDeleteKey) onDeleteKey(selectedDeleteKey);
+      setSelectedDeleteKey("");
+      setShowDeleteInput(false);
+    } catch (e) {
+      // @ts-expect-error: axios error type may not have response property
+      setDeleteError((e?.response?.data?.message as string) || "Ошибка удаления");
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -73,6 +98,27 @@ export function Header({ onAddLanguage, onAddKey }: HeaderProps) {
           ) : (
             <Button className="min-w-[84px] max-w-[480px] h-10 bg-[#0c7ff2] text-white text-sm font-bold tracking-[0.015em]" onClick={() => setShowKeyInput(true)}>
               Add Key
+            </Button>
+          )}
+          {showDeleteInput ? (
+            <div className="flex gap-2 items-center">
+              <Select value={selectedDeleteKey} onValueChange={setSelectedDeleteKey}>
+                <SelectTrigger className="w-[200px]">
+                  <SelectValue placeholder="Выберите ключ для удаления" />
+                </SelectTrigger>
+                <SelectContent>
+                  {keys.map(key => (
+                    <SelectItem key={key} value={key}>{key}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button onClick={handleDeleteKey} className="h-10 bg-red-500 text-white" disabled={deleting || !selectedDeleteKey}>Удалить</Button>
+              <Button variant="outline" onClick={() => setShowDeleteInput(false)} className="h-10" disabled={deleting}>Cancel</Button>
+              {deleteError && <span className="text-red-500 ml-2">{deleteError}</span>}
+            </div>
+          ) : (
+            <Button className="min-w-[84px] max-w-[480px] h-10 bg-red-500 text-white text-sm font-bold tracking-[0.015em]" onClick={() => setShowDeleteInput(true)}>
+              Delete Key
             </Button>
           )}
           <Button
