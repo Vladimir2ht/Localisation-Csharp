@@ -31,3 +31,8 @@ export async function addTranslationKey(key: string) {
 	const response = await axios.put("http://localhost:2000/LocalizationKeys", { key });
 	return response.data;
 }
+
+export async function updateTranslation(key: string, langCode: string, value: string) {
+	const response = await axios.put("http://localhost:2000/Translations", { key, langCode, value });
+	return response;
+}

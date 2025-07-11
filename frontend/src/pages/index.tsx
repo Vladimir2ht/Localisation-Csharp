@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Header } from "../components/Header";
 import { TranslationsTable } from "../components/TranslationsTable";
 import { Pagination } from "../components/Pagination";
-import { getTranslations, getLanguages, addLanguage, addTranslationKey, TranslationRow, Language } from "../api/api";
+import { getTranslations, getLanguages, addLanguage, addTranslationKey, TranslationRow, Language, updateTranslation } from "../api/api";
 import AddLanguageModal from "../components/AddLanguageModal";
 
 /* const INITIAL_DATA = [
@@ -120,17 +120,22 @@ export default function Home() {
 
 	const enabledLanguages = languages.filter(l => l.inUse);
 
-	function handleEdit(key: string, lang: string, value: string) {
-		setData(prev =>
-			prev.map(item =>
-				item.key === key
-					? {
-						...item,
-						translations: { ...item.translations, [lang]: value },
-					}
-					: item
-			)
-		);
+	async function handleEdit(key: string, lang: string, value: string) {
+		try {
+			await updateTranslation(key, lang, value);
+			setData(prev =>
+				prev.map(item =>
+					item.key === key
+						? {
+							...item,
+							translations: { ...item.translations, [lang]: value },
+						}
+						: item
+				)
+			);
+		} catch {
+			// Ошибка сохранения, не обновляем UI
+		}
 	}
 
 	async function handleAddLanguage(ids: number[]) {
@@ -161,7 +166,8 @@ export default function Home() {
 								Translations
 							</p>
 						</div>
-						<TranslationsTable languages={enabledLanguages.map(l => l.name)} data={pagedData} onEdit={handleEdit} />
+						<TranslationsTable languages={enabledLanguages
+						.map(l => ({ name: l.name, code: l.code }))} data={pagedData} onEdit={handleEdit} />
 					</div>
 				</main>
 				<Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />

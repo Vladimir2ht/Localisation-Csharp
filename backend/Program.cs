@@ -32,6 +32,7 @@ builder.Services.AddControllers()
 
 builder.Services.AddScoped<TranslationsTableService>();
 builder.Services.AddScoped<LanguageService>();
+builder.Services.AddScoped<TranslationService>();
 
 builder.Services.AddScoped<FluentValidation.IValidator<LocalizationNamespace.DTOs.LanguageDto>, LocalizationNamespace.Validators.LanguageValidator>();
 

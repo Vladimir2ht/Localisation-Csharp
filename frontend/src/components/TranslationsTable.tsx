@@ -4,24 +4,29 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { TranslationRow } from "@/api/api";
 
+interface Language {
+  name: string;
+  code: string;
+}
+
 interface TranslationsTableProps {
-  languages: string[];
+  languages: Language[];
   data: TranslationRow[];
   onEdit: (key: string, lang: string, value: string) => void;
 }
 
 export function TranslationsTable({ languages, data, onEdit }: TranslationsTableProps) {
-  const [editing, setEditing] = useState<{ key: string; lang: string } | null>(null);
+  const [editing, setEditing] = useState<{ key: string; langCode: string } | null>(null);
   const [editValue, setEditValue] = useState("");
 
   function startEditing(key: string, lang: string, currentValue: string) {
-    setEditing({ key, lang });
+    setEditing({ key, langCode: lang });
     setEditValue(currentValue);
   }
 
   function saveEdit() {
     if (editing) {
-      onEdit(editing.key, editing.lang, editValue);
+      onEdit(editing.key, editing.langCode, editValue);
       setEditing(null);
     }
   }
@@ -41,10 +46,10 @@ export function TranslationsTable({ languages, data, onEdit }: TranslationsTable
               </th>
               {languages.map((lang, idx) => (
                 <th
-                  key={lang}
+                  key={lang.code}
                   className={`w-[400px] px-4 py-3 text-left text-[#111418] text-sm font-medium leading-normal table-column-${(idx + 1) * 120}`}
                 >
-                  {lang}
+                  {lang.name}
                 </th>
               ))}
             </tr>
@@ -56,13 +61,13 @@ export function TranslationsTable({ languages, data, onEdit }: TranslationsTable
                   {key}
                 </td>
                 {languages.map((lang, idx) => {
-                  const isEditing = editing?.key === key && editing.lang === lang;
-                  const value = translations[lang] ?? "";
+                  const isEditing = editing?.key === key && editing.langCode === lang.code;
+                  const value = translations[lang.name] ?? "";
                   return (
                     <td
-                      key={lang}
+                      key={lang.code}
                       className={`w-[400px] h-[72px] px-4 py-2 text-[#60758a] text-sm font-normal leading-normal cursor-pointer table-column-${(idx + 1) * 120}`}
-                      onClick={() => !isEditing && startEditing(key, lang, value)}
+                      onClick={() => !isEditing && startEditing(key, lang.code, value)}
                     >
                       {isEditing ? (
                         <Input
