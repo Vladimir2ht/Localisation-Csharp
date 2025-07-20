@@ -41,42 +41,42 @@ const AddLanguageModal: React.FC<AddLanguageModalProps> = ({ open, languages, on
 	}, [open]);
 
 	return <Dialog open={open} onOpenChange={v => { if (!v) onCancel(); }}>
-			<DialogContent>
-				<DialogHeader>
-					<DialogTitle>Добавить языки</DialogTitle>
-				</DialogHeader>
-				<div className="space-y-2">
-					{selectedCodes.map(code => {
-						const lang = languages.find(l => l.code === code);
-						return lang ? (
-							<div key={code} className="flex items-center gap-2">
-								<span>{lang.name} ({lang.code})</span>
-								<Button variant="outline" size="sm" onClick={() => handleRemove(code)}>Удалить</Button>
-							</div>
-						) : null;
-					})}
-					<div className="flex gap-2 items-center">
-						<Select value={currentSelect ? String(currentSelect) : undefined} onValueChange={val => setCurrentSelect(val)}>
-							<SelectTrigger className="w-[200px]">
-								<SelectValue placeholder="Выберите язык" />
-							</SelectTrigger>
-							<SelectContent>
-								{availableLanguages.map(lang => (
-									<SelectItem key={lang.code} value={String(lang.code)}>
-										{lang.name} ({lang.code})
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
-						<Button onClick={handleAddSelect} disabled={!currentSelect}>Добавить</Button>
-					</div>
+		<DialogContent>
+			<DialogHeader>
+				<DialogTitle>Добавить языки</DialogTitle>
+			</DialogHeader>
+			<div className="space-y-2">
+				{selectedCodes.map(code => {
+					const lang = languages.find(l => l.code === code);
+					return lang ? (
+						<div key={code} className="flex items-center gap-2">
+							<span>{lang.name} ({lang.code})</span>
+							<Button variant="outline" size="sm" onClick={() => handleRemove(code)}>Удалить</Button>
+						</div>
+					) : null;
+				})}
+				<div className="flex gap-2 items-center">
+					<Select value={currentSelect ? String(currentSelect) : undefined} onValueChange={val => setCurrentSelect(val)}>
+						<SelectTrigger className="w-[200px]">
+							<SelectValue placeholder="Выберите язык" />
+						</SelectTrigger>
+						<SelectContent>
+							{availableLanguages.map(lang => (
+								<SelectItem key={lang.code} value={String(lang.code)}>
+									{lang.name} ({lang.code})
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+					<Button onClick={handleAddSelect} disabled={!currentSelect}>Добавить</Button>
 				</div>
-				<DialogFooter>
-					<Button onClick={handleConfirm} disabled={selectedCodes.length === 0}>Подтвердить</Button>
-					<Button variant="outline" onClick={onCancel}>Отмена</Button>
-				</DialogFooter>
-			</DialogContent>
-		</Dialog>;
+			</div>
+			<DialogFooter>
+				<Button onClick={handleConfirm} disabled={selectedCodes.length === 0}>Подтвердить</Button>
+				<Button variant="outline" onClick={onCancel}>Отмена</Button>
+			</DialogFooter>
+		</DialogContent>
+	</Dialog>;
 };
 
 export default AddLanguageModal;

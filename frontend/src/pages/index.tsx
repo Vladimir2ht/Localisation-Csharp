@@ -23,71 +23,7 @@ import AddLanguageModal from "../components/AddLanguageModal";
 			Spanish: "Pausar Juego",
 			French: "Mettre le jeu en pause",
 		},
-	},
-	{
-		key: "resume_game",
-		translations: {
-			English: "Resume Game",
-			Spanish: "Reanudar Juego",
-			French: "Reprendre le jeu",
-		},
-	},
-	{
-		key: "game_over",
-		translations: {
-			English: "Game Over",
-			Spanish: "Fin del Juego",
-			French: "Fin de la partie",
-		},
-	},
-	{
-		key: "score",
-		translations: {
-			English: "Score",
-			Spanish: "Puntuación",
-			French: "Score",
-		},
-	},
-	{
-		key: "level",
-		translations: {
-			English: "Level",
-			Spanish: "Nivel",
-			French: "Niveau",
-		},
-	},
-	{
-		key: "time",
-		translations: {
-			English: "Time",
-			Spanish: "Tiempo",
-			French: "Temps",
-		},
-	},
-	{
-		key: "settings",
-		translations: {
-			English: "Settings",
-			Spanish: "Ajustes",
-			French: "Paramètres",
-		},
-	},
-	{
-		key: "sound",
-		translations: {
-			English: "Sound",
-			Spanish: "Sonido",
-			French: "Son",
-		},
-	},
-	{
-		key: "music",
-		translations: {
-			English: "Music",
-			Spanish: "Música",
-			French: "Musique",
-		},
-	},
+	}
 ]; */
 
 export default function Home() {
@@ -160,36 +96,34 @@ export default function Home() {
 	if (loading) return <div className="p-10 text-center">Загрузка...</div>;
 	if (error) return <div className="p-10 text-center text-red-500">{error}</div>;
 
-	return (
-		<div className="relative flex min-h-screen flex-col bg-white overflow-x-hidden" style={{ fontFamily: 'Inter, "Noto Sans", sans-serif' }}>
-			<div className="layout-container flex h-full grow flex-col">
-				<Header
-					onAddLanguage={() => setShowAddLang(true)}
-					onAddKey={handleAddKey}
-					onDeleteKey={handleDeleteKey}
-					keys={data.map(d => d.key)}
-				/>
-				<main className="px-40 flex flex-1 justify-center py-5">
-					<div className="layout-content-container flex flex-col max-w-[960px] flex-1">
-						<div className="flex flex-wrap justify-between gap-3 p-4">
-							<p className="text-[#111418] tracking-light text-[32px] font-bold leading-tight min-w-72">
-								Translations
-							</p>
-						</div>
-						<TranslationsTable languages={enabledLanguages
-						.map(l => ({ name: l.name, code: l.code }))} data={pagedData} onEdit={handleEdit} />
+	return <div className="relative flex min-h-screen flex-col bg-white overflow-x-hidden" style={{ fontFamily: 'Inter, "Noto Sans", sans-serif' }}>
+		<div className="layout-container flex h-full grow flex-col">
+			<Header
+				onAddLanguage={() => setShowAddLang(true)}
+				onAddKey={handleAddKey}
+				onDeleteKey={handleDeleteKey}
+				keys={data.map(d => d.key)}
+			/>
+			<main className="px-40 flex flex-1 justify-center py-5">
+				<div className="layout-content-container flex flex-col max-w-[960px] flex-1">
+					<div className="flex flex-wrap justify-between gap-3 p-4">
+						<p className="text-[#111418] tracking-light text-[32px] font-bold leading-tight min-w-72">
+							Translations
+						</p>
 					</div>
-				</main>
-				<Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
-			</div>
-			{showAddLang && (
-				<AddLanguageModal
-					open={showAddLang}
-					languages={languages}
-					onConfirm={handleAddLanguage}
-					onCancel={() => setShowAddLang(false)}
-				/>
-			)}
+					<TranslationsTable languages={enabledLanguages
+						.map(l => ({ name: l.name, code: l.code }))} data={pagedData} onEdit={handleEdit} />
+				</div>
+			</main>
+			<Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
 		</div>
-	);
+		{showAddLang && (
+			<AddLanguageModal
+				open={showAddLang}
+				languages={languages}
+				onConfirm={handleAddLanguage}
+				onCancel={() => setShowAddLang(false)}
+			/>
+		)}
+	</div>;
 }

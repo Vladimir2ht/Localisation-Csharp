@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using FluentValidation.AspNetCore;
-using LocalizationNamespace.Data;          // Контекст БД
-using LocalizationNamespace.Services;      // Сервисы (если есть)
-using LocalizationNamespace.Validators;    // Валидация
+using LocalizationNamespace.Data;
+using LocalizationNamespace.Services;
+using LocalizationNamespace.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,28 +11,28 @@ builder.Services.AddCors(options =>
 	options.AddDefaultPolicy(policy =>
 	{
 		policy.WithOrigins("http://localhost:3000")
-				.AllowAnyHeader()
-				.AllowAnyMethod();
+			.AllowAnyHeader()
+			.AllowAnyMethod();
 	});
 });
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 	options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Добавляем контроллеры с поддержкой FluentValidation
 builder.Services.AddControllers()
 	.AddFluentValidation(fv =>
 	{
-		fv.RegisterValidatorsFromAssemblyContaining<Program>(); // Регистрируем валидаторы из сборки
+		fv.RegisterValidatorsFromAssemblyContaining<Program>();
 	});
 
-// Добавляем Swagger для удобства тестирования API (необязательно, но рекомендуется)
-// builder.Services.AddEndpointsApiExplorer();
-// builder.Services.AddSwaggerGen();
+var serviceAssembly = typeof(LocalizationNamespace.Services.LanguageService).Assembly;
+var serviceTypes = serviceAssembly.GetTypes()
+	.Where(t => t.IsClass && !t.IsAbstract && t.Namespace != null && t.Namespace.Contains("Services"));
 
-builder.Services.AddScoped<TranslationsTableService>();
-builder.Services.AddScoped<LanguageService>();
-builder.Services.AddScoped<TranslationService>();
+foreach (var type in serviceTypes)
+{
+	builder.Services.AddScoped(type);
+}
 
 builder.Services.AddScoped<FluentValidation.IValidator<LocalizationNamespace.DTOs.LanguageDto>, LocalizationNamespace.Validators.LanguageValidator>();
 
@@ -47,7 +47,7 @@ if (app.Environment.IsDevelopment())
 }
 else
 {
-	app.UseExceptionHandler("/error"); // Можно настроить контроллер ошибки
+	app.UseExceptionHandler("/error");
 	app.UseHsts();
 }
 
